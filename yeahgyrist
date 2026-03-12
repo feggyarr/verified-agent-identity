@@ -16,7 +16,7 @@ jobs:
   verify:
     runs-on: ubuntu-latest
     env:
-      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true   # Hilangkan warning Node.js
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
     steps:
       - name: Checkout repo
@@ -28,29 +28,29 @@ jobs:
           node-version: '20'
 
       - name: Cleanup folder lama
-        run: rm -rf verified-agent-identity scripts skills
+        run: rm -rf verified-skill
 
-      - name: Clone skill repo (bypass rate limit)
-        run: git clone https://github.com/BillionsNetwork/verified-agent-identity.git verified-agent-identity
+      - name: Clone skill repo (nama unik biar no nesting)
+        run: git clone https://github.com/BillionsNetwork/verified-agent-identity.git verified-skill
 
-      - name: Debug - Cek folder & file
+      - name: Debug - Cek struktur folder
         run: |
-          echo "=== Isi folder skill ==="
-          ls -la verified-agent-identity/
-          echo "=== Folder scripts ==="
-          ls -la verified-agent-identity/scripts/
+          echo "=== Isi skill folder ==="
+          ls -la verified-skill/
+          echo "=== Isi scripts folder (harus ada package.json) ==="
+          ls -la verified-skill/scripts/
 
       - name: Install dependencies
         run: |
-          cd verified-agent-identity
+          cd verified-skill/scripts
           npm install
           npm install ethers @0xpolygonid/js-sdk @iden3/js-iden3-auth uuid cross-fetch shell-quote --save
 
       - name: Create new Ethereum Identity
-        run: cd verified-agent-identity && node scripts/createNewEthereumIdentity.js
+        run: cd verified-skill/scripts && node createNewEthereumIdentity.js
 
       - name: Link Human to Agent
         run: |
-          cd verified-agent-identity && \
-          node scripts/manualLinkHumanToAgent.js \
+          cd verified-skill/scripts && \
+          node manualLinkHumanToAgent.js \
             --challenge '{"name": "${{ inputs.agent_name }}", "description": "${{ inputs.agent_description }}"}'
