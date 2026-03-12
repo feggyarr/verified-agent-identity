@@ -15,6 +15,8 @@ on:
 jobs:
   verify:
     runs-on: ubuntu-latest
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true   # Hilangkan warning Node.js selamanya
 
     steps:
       - name: Checkout repo
@@ -25,23 +27,31 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Install ClawHub skill
-        run: npx clawhub@latest install verified-agent-identity
+      - name: Cleanup folder lama (penting!)
+        run: rm -rf skills/verified-agent-identity
 
-      # === DEBUG BARU (ini yang penting) ===
-      - name: Debug - Cek folder setelah install
+      - name: Install ClawHub skill (non-interactive)
+        run: npx clawhub@latest install verified-agent-identity --yes --no-input
+
+      # === DEBUG SUPER LENGKAP ===
+      - name: DEBUG - Cek struktur folder
         run: |
-          echo "=== Isi root folder ==="
+          echo "=== Isi root ==="
           ls -la
-          echo "=== Folder skills? ==="
-          ls -la skills/ || echo "Folder skills TIDAK ADA!"
-          echo "=== Semua folder scripts di repo ==="
-          find . -name "scripts" -type d
+          echo "=== Folder skills ==="
+          ls -la skills/ || echo "skills/ TIDAK ADA"
+          echo "=== Folder skill ==="
+          ls -la skills/verified-agent-identity/ || echo "verified-agent-identity TIDAK ADA"
+          echo "=== Folder scripts ==="
+          ls -la skills/verified-agent-identity/scripts/ || echo "scripts/ TIDAK ADA"
+          echo "=== Semua scripts di repo ==="
+          find . -name "*.js" | head -10
 
       - name: Install script dependencies
         run: |
           cd skills/verified-agent-identity/scripts
           npm install
+          npm install ethers @0xpolygonid/js-sdk @iden3/js-iden3-auth uuid cross-fetch shell-quote --save
 
       - name: Create new Ethereum Identity
         run: node skills/verified-agent-identity/scripts/createNewEthereumIdentity.js
