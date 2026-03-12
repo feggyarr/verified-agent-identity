@@ -28,6 +28,16 @@ jobs:
       - name: Install ClawHub skill
         run: npx clawhub@latest install verified-agent-identity
 
+      # === DEBUG BARU (ini yang penting) ===
+      - name: Debug - Cek folder setelah install
+        run: |
+          echo "=== Isi root folder ==="
+          ls -la
+          echo "=== Folder skills? ==="
+          ls -la skills/ || echo "Folder skills TIDAK ADA!"
+          echo "=== Semua folder scripts di repo ==="
+          find . -name "scripts" -type d
+
       - name: Install script dependencies
         run: |
           cd skills/verified-agent-identity/scripts
